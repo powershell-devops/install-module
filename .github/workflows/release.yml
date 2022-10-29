@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    if: github.event.pull_request.merged
+
+    permissions:
+      contents: write
+
+    steps:
+    - id: semver
+      uses: k-phoen/semver-release-action@v1.3.2 
+      with:
+        release_branch: main
+        release_strategy: release
+        tag_format: v%major%.%minor%.%patch%
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - run: |
+        $Tag = ($env:VERSION -split '\.' | Select-Object -First 2) -join '.'
+        gh api repos/${{ github.repository }}/git/refs -X POST -F ref=refs/tags/$Tag -F sha=${{ github.sha }} `
+          || $(gh api repos/${{ github.repository }}/git/refs/tags/$Tag -X PATCH -F sha=${{ github.sha }} -F force=true)
+      shell: pwsh
+      if: ${{ steps.semver.outputs.tag != '' }}
+      env:
+        VERSION: ${{ steps.semver.outputs.tag }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - run: |
+        $Tag = ($env:VERSION -split '\.' | Select-Object -First 1) -join '.'
+        gh api repos/${{ github.repository }}/git/refs -X POST -F ref=refs/tags/$Tag -F sha=${{ github.sha }} `
+          || $(gh api repos/${{ github.repository }}/git/refs/tags/$Tag -X PATCH -F sha=${{ github.sha }} -F force=true)
+      shell: pwsh
+      if: ${{ steps.semver.outputs.tag != '' }}
+      env:
+        VERSION: ${{ steps.semver.outputs.tag }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

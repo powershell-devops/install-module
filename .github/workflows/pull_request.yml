@@ -1,0 +1,29 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+    - main
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  integration-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        runs-on: ['ubuntu-latest', 'windows-latest']
+        required-version: ['1.0.0']
+        minimum-version: ['', '1.0.0']
+        maximum-version: ['', '1.0.0']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: ./
+      with:
+        required-version: ${{ matrix.required-version }}
+        minimum-version: ${{ matrix.minimum-version }}
+        maximum-version: ${{ matrix.maximum-version }}
