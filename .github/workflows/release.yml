@@ -45,7 +45,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - run: |
-        gh api repos/${{ github.repository }}/git/refs -X DELETE -F ref=refs/tags/$env:VERSION
+        gh api repos/${{ github.repository }}/git/refs/tags/$env:VERSION -X DELETE
       shell: pwsh
       if: ${{ steps.semver.outputs.tag != '' }}
       env:
