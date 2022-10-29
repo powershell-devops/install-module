@@ -6,7 +6,7 @@ PowerShell module for dealing with commands in Azure DevOps Pipelines and GitHub
 
 ## GitHub Action
 
-See [action.yml](action.yml) for detailed list of inputs.
+See [action.yml](action.yml) for a detailed list of inputs.
 
 Basic:
 
