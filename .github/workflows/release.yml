@@ -44,8 +44,13 @@ jobs:
         VERSION: ${{ steps.semver.outputs.tag }} 
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - run: git tag -d ${{ steps.semver.outputs.tag }} 
+    - run: |
+        gh api repos/${{ github.repository }}/git/refs -X DELETE -F ref=refs/tags/$env:VERSION
+      shell: pwsh
       if: ${{ steps.semver.outputs.tag != '' }}
+      env:
+        VERSION: ${{ steps.semver.outputs.tag }} 
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: actions/create-release@v1
       if: ${{ steps.semver.outputs.tag != '' }}
